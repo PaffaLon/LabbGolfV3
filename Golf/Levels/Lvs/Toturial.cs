@@ -12,7 +12,7 @@ namespace Golf.Levels.Lvs
             this.GolfBallStartPosition = (0);
             this.GolfHolePositionStart = (100);
             this.Dimension = new double[1, 1]; 
-            { { 0.01 } {  } };
+            //{ { 0.01 } {  } };
         }
 
         public double GetMapLength()
@@ -28,6 +28,16 @@ namespace Golf.Levels.Lvs
         public double GetGolfHoleStartPosition()
         {
             return this.GolfHolePositionStart;
+        }
+
+        public double GetGravity()
+        {
+            return this.Gravity;
+        }
+
+        public double GetDistanceBetween(double distance)
+        {
+            return distance;
         }
     }
 }

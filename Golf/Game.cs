@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
+using System.Threading;
 using Golf.Entitys;
 using Golf.Levels.Lvs;
 
@@ -20,10 +22,6 @@ namespace Golf
         /// </summary>
         private double Distance { get; set; }
 
-        /// <summary>
-        /// The distance the ball have traveld from position A to B.
-        /// </summary>
-        private double TravelDistance { get; set; }
         public int MyPower { get; private set; }
 
         private const double angleMax = 379;
@@ -32,15 +30,18 @@ namespace Golf
 
         //Private Feaild Initialization
         private double angle;
+        private double angleOfTheRadious;
         private int    swingsMade;
         private bool   gameWon;
         private bool   validAngle;
+        private bool swingedGolfClub;
 
         GolfBall golfBall = new GolfBall();
         Toturial toturial = new Toturial();
         internal Game()
         {
-            
+            golfBall.SetPosition(toturial.GetGolfBallStartPosition());
+            Console.CursorVisible = false;
         }
 
         public void RunGame()
@@ -49,19 +50,59 @@ namespace Golf
             while (gameWon == false)
             {
                 GameControles();
+                if (swingedGolfClub == true)
+                {
+                    CalculateTheAngleOfTheRadius();
+                    CalculateDistance();
 
+                    if (golfBall.getPosition() != toturial.GetGolfHoleStartPosition())
+                    {
+                        if (golfBall.getPosition() > toturial.GetGolfHoleStartPosition())
+                        {
+
+                        }
+                        else if (golfBall.getPosition() < toturial.GetGolfHoleStartPosition())
+                        {
+
+                        }
+                        else
+                        {
+                            Console.WriteLine("Someting Went wrong with the ditsance");
+                            Thread.Sleep(60000);// Paused 60s
+                            Console.SetCursorPosition(50, 50);
+                            swingedGolfClub = false;
+                        }
+                    }
+                    else
+                    {
+                        gameWon = true;
+                        Console.SetCursorPosition(25, 0);
+                        Console.WriteLine("You Win!!!");
+                        Thread.Sleep(60000);// Paused 60s
+                    }
+                }
                 
             }
         }
+        private void CalculateTheAngleOfTheRadius()
+        {
+            angleOfTheRadious = (Math.PI / 180 ) * angle;
+        }
+        private void CalculateDistance()
+        {
+            double velocity = 45;
+            Distance = (Math.Pow(velocity, 2) / toturial.GetGravity() * Math.Sin(2 * angleOfTheRadious));
+        }
+
+
 
         private void GameControles()
         {
+            Console.SetCursorPosition(70, 3);
             ConsoleKeyInfo cki;
             cki = Console.ReadKey();
             //ArrowUP,   PageUP
-            if ((cki.Key.GetHashCode() == 38)
-                && ((cki.Modifiers & ConsoleModifiers.Control) != 0)  
-                && ((cki.Modifiers & ConsoleModifiers.Shift)   != 0))
+            if ((cki.Key.GetHashCode() == 38) && ((cki.Modifiers & ConsoleModifiers.Control) != 0) && ((cki.Modifiers & ConsoleModifiers.Shift)   != 0))
             {
                 angle += 0.01;
                 MyPower = (int)Power.Increment;
@@ -81,7 +122,7 @@ namespace Golf
             }
    
             //ArrowDOWN, PageDOWN
-            else if ((cki.Key.GetHashCode() == 38)
+            else if ((cki.Key.GetHashCode() == 40)
                 && ((cki.Modifiers & ConsoleModifiers.Control) != 0)
                 && ((cki.Modifiers & ConsoleModifiers.Shift) != 0))
             {
@@ -89,34 +130,44 @@ namespace Golf
                 MyPower = (int)Power.decement;
                 AngleValidation();
             }
-            else if ((cki.Key.GetHashCode() == 38) && ((cki.Modifiers & ConsoleModifiers.Control) != 0))
+            else if ((cki.Key.GetHashCode() == 40) && ((cki.Modifiers & ConsoleModifiers.Control) != 0))
             {
                 angle -= 0.1;
                 MyPower = (int)Power.decement;
                 AngleValidation();
             }
-            else if ((cki.Key.GetHashCode() == 38))
+            else if ((cki.Key.GetHashCode() == 40))
             {
                 angle -= 1;
                 MyPower = (int)Power.decement;
                 AngleValidation();
             }
 
+            //Swing
+            else if (cki.GetHashCode() == 32)
+            {
+                swingedGolfClub = true;
+            }
+
             void AngleValidation()
             {
                 if (MyPower == (int)Power.Increment)
                 {
+                    if (angle > angleMax)
+                        angle = angleMax - 1;
                     Console.SetCursorPosition(70, 3);
-                    Console.WriteLine($"Your swing Angle: {angle}");
+                    Console.WriteLine("           ");
                 }
                 else if (MyPower == (int)Power.decement)
                 {
                     if (angle < angleMin)
                         angle = 0.01;
-
                     Console.SetCursorPosition(70, 3);
-                    Console.WriteLine($"Your swing Angle: {angle}");
+                    Console.WriteLine("           ");
                 }
+                Console.SetCursorPosition(70, 3);
+                Console.WriteLine($"Your swing Angle: {angle}");
+                Console.SetCursorPosition(90 , 3);
             }
         }
 
